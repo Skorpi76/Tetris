@@ -8,6 +8,8 @@ public class Tetromino : MonoBehaviour
     public float fallSpeed = 1;
     public bool allowRotation = true;
     public bool limitRotation = false;
+    public int individualScore = 100;
+    private float individualScoreTime; 
 
     void Start()
     {
@@ -18,9 +20,22 @@ public class Tetromino : MonoBehaviour
     void Update()
     {
         CheckUserInput();
+        UpdateIndividualScore();
     }
 
-
+    void UpdateIndividualScore()
+    {
+        if (individualScoreTime < 1)
+        {
+            individualScoreTime += Time.deltaTime;
+        }
+        else
+        {
+            individualScoreTime = 0;
+            individualScore = Mathf.Max(individualScore - 10, 0);
+        }
+       
+    }
 
     void CheckUserInput()
     {
@@ -108,8 +123,10 @@ public class Tetromino : MonoBehaviour
                     FindObjectOfType<Game>().GameOver();
                 }
 
-                enabled = false;
+
                 FindObjectOfType<Game>().SpawnNextTetromino();
+                Game.currentScore += individualScore;
+                enabled = false;
             }
             else
             {

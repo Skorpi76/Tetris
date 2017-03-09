@@ -1,18 +1,80 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Game : MonoBehaviour
 {
     public static int gridWidth = 10;
     public static int gridHeight = 20;
+
     public static Transform[,] grid = new Transform[gridWidth, gridHeight];
+    public Text hud_score;
+
+    public int scoreOneLine = 40;
+    public int scoreTwoLine = 100;
+    public int scoreThreeLine = 300;
+    public int scoreFourLine = 1200;
+    private int numberOfRowsThisTurn = 0;
+    public static int currentScore = 0;
 
 
     void Start()
     {
         SpawnNextTetromino();
     }
+
+    void Update()
+    {
+        UpdateScore();
+        UpdateUI();
+        
+    }
+
+    public void UpdateUI()
+    {
+        hud_score.text = currentScore.ToString();
+    }
+    public void UpdateScore()
+    {
+        if (numberOfRowsThisTurn > 0)
+        {
+            if (numberOfRowsThisTurn == 1)
+            {
+                ClearedOneLine();
+            }
+            else if (numberOfRowsThisTurn == 2)
+            {
+                ClearedTwoLines();
+            }
+            else if (numberOfRowsThisTurn == 3)
+            {
+                ClearedThreeLines();
+            }
+            else if (numberOfRowsThisTurn == 4)
+            {
+                ClearedFourLines();
+            }
+            numberOfRowsThisTurn = 0;           
+        } 
+    }
+    public void ClearedOneLine()
+    {
+        currentScore += scoreOneLine;
+    }
+    public void ClearedTwoLines()
+    {
+        currentScore += scoreTwoLine;
+    }
+    public void ClearedThreeLines()
+    {
+        currentScore += scoreThreeLine;
+    }
+    public void ClearedFourLines()
+    {
+        currentScore += scoreFourLine;
+    }
+
     public bool ChechIsAboveGrid(Tetromino tetromino)
     {
         for (int x = 0; x < gridWidth; ++x)
@@ -30,13 +92,18 @@ public class Game : MonoBehaviour
     }
     public bool IsFullRowAt(int y)
     {
+        // The parameter ym is the row we will iterate over in the grid array to check each x position for a transfor.
         for (int x = 0; x < gridWidth; ++x)
         {
+            // If we find a position that returns Null instead of a transform, then we know that the row is not full.
             if (grid[x, y] == null)
             {
                 return false;
             }
         }
+        // Since we found a full row, we increment the full row variable. 
+        numberOfRowsThisTurn++;
+        // if we iterated over the entire loop and didnt encounter any null positions, that we return true.
         return true;
     }
 
