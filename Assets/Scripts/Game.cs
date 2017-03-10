@@ -17,18 +17,25 @@ public class Game : MonoBehaviour
     public int scoreFourLine = 1200;
     private int numberOfRowsThisTurn = 0;
     public static int currentScore = 0;
+    private AudioSource audioSource;
+    public AudioClip clearLineSound;
+    public AudioClip doubleKill;
+    public AudioClip tripleKill;
+    public AudioClip monsterKill;
+   
 
 
     void Start()
     {
         SpawnNextTetromino();
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
     {
         UpdateScore();
         UpdateUI();
-        
+      
     }
 
     public void UpdateUI()
@@ -42,6 +49,7 @@ public class Game : MonoBehaviour
             if (numberOfRowsThisTurn == 1)
             {
                 ClearedOneLine();
+              
             }
             else if (numberOfRowsThisTurn == 2)
             {
@@ -55,24 +63,48 @@ public class Game : MonoBehaviour
             {
                 ClearedFourLines();
             }
-            numberOfRowsThisTurn = 0;           
+            numberOfRowsThisTurn = 0;
+          
         } 
     }
     public void ClearedOneLine()
-    {
+    {    
         currentScore += scoreOneLine;
+        PlayLineClearedSound();
     }
     public void ClearedTwoLines()
     {
+        PlayDoubleKill();
         currentScore += scoreTwoLine;
+        
     }
     public void ClearedThreeLines()
     {
+        PlayTripleKill();
         currentScore += scoreThreeLine;
+ 
     }
     public void ClearedFourLines()
     {
+        PlayMonsterKill();
         currentScore += scoreFourLine;
+     
+    }
+     void PlayLineClearedSound()
+    {      
+            audioSource.PlayOneShot(clearLineSound);       
+    }
+     void PlayDoubleKill()
+    {
+        audioSource.PlayOneShot(doubleKill);
+    }
+     void PlayTripleKill()
+    {
+        audioSource.PlayOneShot(tripleKill);
+    }
+     void PlayMonsterKill()
+    {
+        audioSource.PlayOneShot(monsterKill);
     }
 
     public bool ChechIsAboveGrid(Tetromino tetromino)
@@ -201,7 +233,7 @@ public class Game : MonoBehaviour
     string GetRandomTetromino()
     {
         int randomTetromino = Random.Range(1, 8);
-        string randomTetrominoName = "Prefubs/Tetromino_T";
+        string randomTetrominoName = "Prefubs/Tetromino_long";
         switch (randomTetromino)
         {
             case 1:
