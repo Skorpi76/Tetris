@@ -10,11 +10,18 @@ public class Game : MonoBehaviour
 
     public static Transform[,] grid = new Transform[gridWidth, gridHeight];
     public Text hud_score;
+    public Text hud_level;
+    public Text hud_lines;
 
     public int scoreOneLine = 40;
     public int scoreTwoLine = 100;
     public int scoreThreeLine = 300;
     public int scoreFourLine = 1200;
+
+    public int currentLevel = 0;
+    private int numLinesCleared = 0; 
+    public float fallSpeed = 1.0f; 
+
     private int numberOfRowsThisTurn = 0;
     public static int currentScore = 0;
     private AudioSource audioSource;
@@ -22,7 +29,10 @@ public class Game : MonoBehaviour
     public AudioClip doubleKill;
     public AudioClip tripleKill;
     public AudioClip monsterKill;
-   
+    private GameObject previewTetromino;
+    private GameObject nextTetromino;
+    private bool gameStarted = false;
+    private Vector2 previwTetrominoPosition = new Vector2(16.5f, 12.5f);
 
 
     void Start()
@@ -35,12 +45,28 @@ public class Game : MonoBehaviour
     {
         UpdateScore();
         UpdateUI();
+        UpdateLevel();
+        UpdateSpeed();
+
+    }
+
+    void UpdateLevel()
+    {
+        currentLevel = numLinesCleared / 10;       
+      
+    }
+    void UpdateSpeed()
+    {
+        fallSpeed = 1.0f - ((float)currentLevel * 0.1f);
       
     }
 
     public void UpdateUI()
     {
         hud_score.text = currentScore.ToString();
+        hud_level.text = currentLevel.ToString();
+        hud_lines.text = numLinesCleared.ToString();         
+
     }
     public void UpdateScore()
     {
@@ -49,7 +75,7 @@ public class Game : MonoBehaviour
             if (numberOfRowsThisTurn == 1)
             {
                 ClearedOneLine();
-              
+
             }
             else if (numberOfRowsThisTurn == 2)
             {
@@ -64,45 +90,49 @@ public class Game : MonoBehaviour
                 ClearedFourLines();
             }
             numberOfRowsThisTurn = 0;
-          
-        } 
+
+        }
     }
     public void ClearedOneLine()
-    {    
-        currentScore += scoreOneLine;
+    {
+        currentScore += scoreOneLine + (currentLevel * 20);
         PlayLineClearedSound();
+        numLinesCleared++;
     }
     public void ClearedTwoLines()
     {
         PlayDoubleKill();
-        currentScore += scoreTwoLine;
-        
+        currentScore += scoreTwoLine + (currentLevel * 25);
+        numLinesCleared += 2;
+
     }
     public void ClearedThreeLines()
     {
         PlayTripleKill();
-        currentScore += scoreThreeLine;
- 
+        currentScore += scoreThreeLine + (currentLevel * 30);
+        numLinesCleared += 3;
+
     }
     public void ClearedFourLines()
     {
         PlayMonsterKill();
-        currentScore += scoreFourLine;
-     
+        currentScore += scoreFourLine + (currentLevel * 50);
+        numLinesCleared += 4;
+
     }
-     void PlayLineClearedSound()
-    {      
-            audioSource.PlayOneShot(clearLineSound);       
+    void PlayLineClearedSound()
+    {
+        audioSource.PlayOneShot(clearLineSound);
     }
-     void PlayDoubleKill()
+    void PlayDoubleKill()
     {
         audioSource.PlayOneShot(doubleKill);
     }
-     void PlayTripleKill()
+    void PlayTripleKill()
     {
         audioSource.PlayOneShot(tripleKill);
     }
-     void PlayMonsterKill()
+    void PlayMonsterKill()
     {
         audioSource.PlayOneShot(monsterKill);
     }
@@ -227,8 +257,29 @@ public class Game : MonoBehaviour
 
     public void SpawnNextTetromino()
     {
-        GameObject nextTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(),
-            typeof(GameObject)), new Vector2(5.0f, 20.0f), Quaternion.identity);
+        if (!gameStarted)
+        {
+            gameStarted = true;
+            nextTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(),
+      typeof(GameObject)), new Vector2(5.0f, 20.0f), Quaternion.identity);
+
+            previewTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(),
+       typeof(GameObject)), previwTetrominoPosition, Quaternion.identity);
+
+            previewTetromino.GetComponent<Tetromino>().enabled = false;
+        }
+        else
+        {
+            previewTetromino.transform.localPosition = new Vector2(5.0f, 20.0f);
+            nextTetromino = previewTetromino;
+            nextTetromino.GetComponent<Tetromino>().enabled = true;
+
+            previewTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(),
+           typeof(GameObject)), previwTetrominoPosition, Quaternion.identity);
+
+            previewTetromino.GetComponent<Tetromino>().enabled = false;
+        }
+
     }
     string GetRandomTetromino()
     {
