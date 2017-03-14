@@ -18,9 +18,12 @@ public class Game : MonoBehaviour
     public int scoreThreeLine = 300;
     public int scoreFourLine = 1200;
 
+    public static bool startingAtLevelZero;
+    public static int startingLevel;
+
     public int currentLevel = 0;
     private int numLinesCleared = 0; 
-    public float fallSpeed = 1.0f; 
+    public static float fallSpeed = 1.0f; 
 
     private int numberOfRowsThisTurn = 0;
     public static int currentScore = 0;
@@ -37,6 +40,7 @@ public class Game : MonoBehaviour
 
     void Start()
     {
+        currentLevel = startingLevel;
         SpawnNextTetromino();
         audioSource = GetComponent<AudioSource>();
     }
@@ -47,12 +51,17 @@ public class Game : MonoBehaviour
         UpdateUI();
         UpdateLevel();
         UpdateSpeed();
-
+        if (Input.GetKey("escape"))
+            Application.Quit();
     }
 
     void UpdateLevel()
     {
-        currentLevel = numLinesCleared / 10;       
+        if ((startingAtLevelZero == true) || (startingAtLevelZero == false && numLinesCleared / 10 > startingLevel)) 
+        {
+            currentLevel = numLinesCleared / 10;
+        }
+          
       
     }
     void UpdateSpeed()
@@ -278,6 +287,7 @@ public class Game : MonoBehaviour
            typeof(GameObject)), previwTetrominoPosition, Quaternion.identity);
 
             previewTetromino.GetComponent<Tetromino>().enabled = false;
+     
         }
 
     }

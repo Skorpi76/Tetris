@@ -31,7 +31,7 @@ public class Tetromino : MonoBehaviour
     void Start()
     {
         audioSourse = GetComponent<AudioSource>();
-        fallSpeed = GameObject.Find("Grid").GetComponent<Game>().fallSpeed; // expencive for cpu and etc 
+       
     }
 
 
@@ -39,6 +39,11 @@ public class Tetromino : MonoBehaviour
     {
         CheckUserInput();
         UpdateIndividualScore();
+        UpdateFallSpeed();
+    }
+    void UpdateFallSpeed()
+    {
+        fallSpeed = Game.fallSpeed;
     }
 
     void UpdateIndividualScore()
