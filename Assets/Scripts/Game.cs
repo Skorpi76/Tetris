@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Game : MonoBehaviour
 {
@@ -323,7 +324,7 @@ public class Game : MonoBehaviour
     }
 
     public void GameOver()
-    {
-        Application.LoadLevel("GameOver");
+    {       
+        SceneManager.LoadScene("GameOver");
     }
 }

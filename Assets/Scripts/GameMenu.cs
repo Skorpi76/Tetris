@@ -2,14 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 
 
 public class GameMenu : MonoBehaviour {
 
     public Text levelText;
-	// Use this for initialization
+
+    
 	void Start () {
+       // if (Application.loadedLevelName == "GameMenu")
+       if(SceneManager.GetActiveScene().name == "GameMenu")
         levelText.text = "0";
 	}
 
@@ -20,7 +24,7 @@ public class GameMenu : MonoBehaviour {
         else
             Game.startingAtLevelZero = false; 
 
-        Application.LoadLevel("level");
+        SceneManager.LoadScene("level");
     }
     public void Quit()
     {
