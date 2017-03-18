@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityStandardAssets.ImageEffects;
 using UnityEngine.SceneManagement;
+using System;
+
+
 
 public class Game : MonoBehaviour
 {
@@ -21,6 +25,7 @@ public class Game : MonoBehaviour
 
     public static bool startingAtLevelZero;
     public static int startingLevel;
+    public static bool isPaused = false;
 
     public int currentLevel = 0;
     private int numLinesCleared = 0; 
@@ -33,27 +38,82 @@ public class Game : MonoBehaviour
     public AudioClip doubleKill;
     public AudioClip tripleKill;
     public AudioClip monsterKill;
+    public Canvas hud_Canvas;
+    public Canvas pause_Canvas;
+
     private GameObject previewTetromino;
     private GameObject nextTetromino;
     private bool gameStarted = false;
     private Vector2 previwTetrominoPosition = new Vector2(16.5f, 12.5f);
+    private int startingHighScore;
+    private int startingHighScore2;
+    private int startingHighScore3;
 
 
     void Start()
     {
+        currentScore = 0;
+        hud_score.text = "0";
+      
+    
         currentLevel = startingLevel;
+        hud_level.text = currentLevel.ToString();
+        hud_lines.text = "0";
         SpawnNextTetromino();
         audioSource = GetComponent<AudioSource>();
+
+        startingHighScore = PlayerPrefs.GetInt("highscore");
+        startingHighScore2 = PlayerPrefs.GetInt("highscore2");
+        startingHighScore3 = PlayerPrefs.GetInt("highscore3");
+
     }
 
     void Update()
     {
+        CheckUserInput();
         UpdateScore();
         UpdateUI();
         UpdateLevel();
         UpdateSpeed();
         if (Input.GetKey("escape"))
             Application.Quit();
+
+     
+    }
+
+    private void CheckUserInput()
+    {
+        if (Input.GetKeyUp(KeyCode.P))
+        {
+            if (Time.timeScale == 1)
+            {
+                PauseGame();
+            }
+            else
+            {
+                ResumeGame();
+            }          
+        }
+    }
+
+    private void ResumeGame()
+    {
+        Time.timeScale = 1;
+        audioSource.Play();
+        isPaused = false;
+        hud_Canvas.enabled = true;
+        pause_Canvas.enabled = false;
+        Camera.main.GetComponent<Blur>().enabled = false;
+    }
+
+    private void PauseGame()
+    {
+        Time.timeScale = 0;
+        audioSource.Pause();
+        isPaused = true;
+        hud_Canvas.enabled = false;
+        pause_Canvas.enabled = true;
+        Camera.main.GetComponent<Blur>().enabled = true;
     }
 
     void UpdateLevel()
@@ -101,21 +161,31 @@ public class Game : MonoBehaviour
             }
             numberOfRowsThisTurn = 0;
 
+            Camera.main.GetComponent<NoiseAndGrain>().enabled = true;
+            Invoke("wakeup", 0.5f);  // Time in seconds
+     
         }
+    }
+    void wakeup()
+    {
+        Camera.main.GetComponent<NoiseAndGrain>().enabled = false;
     }
     public void ClearedOneLine()
     {
         currentScore += scoreOneLine + (currentLevel * 20);
         PlayLineClearedSound();
         numLinesCleared++;
+
     }
+  
+
     public void ClearedTwoLines()
     {
         PlayDoubleKill();
         currentScore += scoreTwoLine + (currentLevel * 25);
         numLinesCleared += 2;
 
-    }
+    }     
     public void ClearedThreeLines()
     {
         PlayTripleKill();
@@ -130,7 +200,26 @@ public class Game : MonoBehaviour
         numLinesCleared += 4;
 
     }
-    void PlayLineClearedSound()
+    public void UpdateHighScore()
+    {
+        if (currentScore > startingHighScore)
+        {
+            PlayerPrefs.SetInt("highscore3", startingHighScore2);
+            PlayerPrefs.SetInt("highscore2", startingHighScore);
+
+            PlayerPrefs.SetInt("highscore", currentScore);
+        }
+        else if (currentScore > startingHighScore2)
+        {
+            PlayerPrefs.SetInt("highscore3", startingHighScore2);
+            PlayerPrefs.SetInt("highscore2", currentScore);
+        }
+        else if (currentScore > startingHighScore3)
+        {
+            PlayerPrefs.SetInt("highscore3", currentScore);
+        }
+    }
+    void PlayLineClearedSound()                    
     {
         audioSource.PlayOneShot(clearLineSound);
     }
@@ -294,7 +383,7 @@ public class Game : MonoBehaviour
     }
     string GetRandomTetromino()
     {
-        int randomTetromino = Random.Range(1, 8);
+        int randomTetromino = UnityEngine.Random.Range(1, 8);
         string randomTetrominoName = "Prefubs/Tetromino_long";
         switch (randomTetromino)
         {
@@ -326,5 +415,6 @@ public class Game : MonoBehaviour
     public void GameOver()
     {       
         SceneManager.LoadScene("GameOver");
+        UpdateHighScore();
     }
 }

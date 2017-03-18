@@ -37,9 +37,13 @@ public class Tetromino : MonoBehaviour
 
     void Update()
     {
-        CheckUserInput();
-        UpdateIndividualScore();
-        UpdateFallSpeed();
+        if (!Game.isPaused)
+        {
+            CheckUserInput();
+            UpdateIndividualScore();
+            UpdateFallSpeed();
+        }
+       
     }
     void UpdateFallSpeed()
     {
@@ -215,6 +219,8 @@ public class Tetromino : MonoBehaviour
             PlayLandAudio();
             FindObjectOfType<Game>().SpawnNextTetromino();
             Game.currentScore += individualScore;
+
+           // FindObjectOfType<Game>().UpdateHighScore();    // updating high score 
             enabled = false;
         }
         else
