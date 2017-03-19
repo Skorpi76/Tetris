@@ -20,6 +20,7 @@ public class GameMenu : MonoBehaviour {
         if (SceneManager.GetActiveScene().name == "GameMenu")
         {
             levelText.text = "0";
+            Game.startingLevel = 0;
             //PlayerPrefs.SetInt("highscore", 20);           
         }
         if (SceneManager.GetActiveScene().name == "GameOver")

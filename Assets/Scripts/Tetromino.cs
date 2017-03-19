@@ -222,6 +222,7 @@ public class Tetromino : MonoBehaviour
 
            // FindObjectOfType<Game>().UpdateHighScore();    // updating high score 
             enabled = false;
+            tag = "Untagged";
         }
         else
         {
